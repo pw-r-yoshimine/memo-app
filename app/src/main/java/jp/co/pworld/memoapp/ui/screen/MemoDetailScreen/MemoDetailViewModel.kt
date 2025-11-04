@@ -25,8 +25,21 @@ class MemoDetailViewModel
         private val repository: MemoRepository,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
+
+        /**
+         * 重要ポイント!!
+         * メモ詳細画面のUI状態を保持する
+         *  ViewModel内部で状態を更新するために必要
+         */
         private val _uiState = MutableStateFlow(MemoDetailUiState())
+
+        /**
+         * 重要ポイント!!
+         * UIに公開する読み取り専用の状態。
+         * UI側はこのuiStateを監視して、状態が更新されるたびに再描画される。
+         */
         val uiState: StateFlow<MemoDetailUiState> = _uiState
+
 
         private val memoType: MemoType =
             MemoType.fromRouteName(

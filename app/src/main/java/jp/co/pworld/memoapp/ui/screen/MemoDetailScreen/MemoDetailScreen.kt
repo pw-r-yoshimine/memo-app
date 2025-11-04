@@ -49,6 +49,11 @@ fun MemoDetailScreen(
     navController: NavHostController,
     viewModel: MemoDetailViewModel = hiltViewModel(),
 ) {
+    /**
+     *  重要ポイント!!
+     *  ViewModel内の StateFlow(uiState) を Compose 側で監視する。
+     *  状態が更新されるたびに、最新の値がこの uiState に反映される。
+     */
     val uiState: MemoDetailUiState by viewModel.uiState.collectAsState()
 
     Scaffold(
@@ -70,11 +75,11 @@ fun MemoDetailScreen(
                             when {
                                 // 編集モードでかつ、メモの内容が空の場合 -> メモを削除する
                                 uiState.memoType == MemoType.Edit && uiState.content.isEmpty() -> {
-                                    viewModel.deleteMemo()
+                                    // TODO メモを削除する処理を追加してください
                                 }
                                 // メモが記入されている場合 -> メモを保存する
                                 uiState.content.isNotBlank() -> {
-                                    viewModel.saveMemo()
+                                    // TODO メモを保存する処理を追加してください
                                 }
                             }
                             navController.navigate(Screen.MemoList.route) {
@@ -130,7 +135,8 @@ fun MemoDetailScreen(
                 viewModel.setDeleteDialogVisible(false)
             },
             onConfirmation = {
-                viewModel.deleteMemo()
+                // TODO メモを削除する処理を追加してください
+
                 viewModel.setDeleteDialogVisible(false)
                 navController.navigate(Screen.MemoList.route) {
                     popUpTo(Screen.MemoList.route) { inclusive = true }

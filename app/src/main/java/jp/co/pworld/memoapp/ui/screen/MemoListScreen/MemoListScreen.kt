@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -50,6 +51,11 @@ fun MemoListScreen(
     navController: NavController,
     viewModel: MemoListViewModel = hiltViewModel(),
 ) {
+    /**
+     *  重要ポイント!!
+     *  MemoListUiStateを監視している
+     *  状態(uiState)が更新されるたびに、最新の値がこのuiStateに反映される。
+     */
     val uiState: MemoListUiState by viewModel.uiState.collectAsState()
 
     Scaffold(
@@ -116,7 +122,7 @@ private fun MemoAddButton(
     onClick: () -> Unit,
 ) {
     Button(
-        modifier = Modifier,
+        modifier = modifier,
         onClick = { onClick() },
         colors =
             ButtonDefaults.buttonColors(
@@ -130,6 +136,20 @@ private fun MemoAddButton(
             tint = Color.Black,
             contentDescription = "収支入力",
             modifier = Modifier.fillMaxSize().padding(16.dp),
+        )
+    }
+}
+
+@Preview
+@Composable
+fun MemoAddButtonPreview (){
+    Box(
+        modifier =
+            Modifier.size(60.dp),
+    ) {
+        MemoAddButton(
+            modifier = Modifier,
+            onClick = {},
         )
     }
 }
