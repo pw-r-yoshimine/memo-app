@@ -6,10 +6,12 @@
 
 package jp.co.pworld.memoapp.ui.screen.MemoDetailScreen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -51,6 +53,14 @@ fun MemoDetailScreen(
 ) {
     val uiState: MemoDetailUiState by viewModel.uiState.collectAsState()
 
+    /**
+     * 戻るスワイプ感知
+     */
+    BackHandler {
+        viewModel.processBackNavigation()
+        navController.popBackStack()
+    }
+
     Scaffold(
         containerColor = Color.Black,
         contentWindowInsets = WindowInsets.safeDrawing.union(WindowInsets.ime),
@@ -66,24 +76,17 @@ fun MemoDetailScreen(
                 title = {},
                 navigationIcon = {
                     IconButton(
+                        modifier = Modifier,
                         onClick = {
-                            when {
-                                // 編集モードでかつ、メモの内容が空の場合 -> メモを削除する
-                                uiState.memoType == MemoType.Edit && uiState.content.isEmpty() -> {
-                                    viewModel.deleteMemo()
-                                }
-                                // メモが記入されている場合 -> メモを保存する
-                                uiState.content.isNotBlank() -> {
-                                    viewModel.saveMemo()
-                                }
-                            }
-                            navController.navigate(Screen.MemoList.route) {
-                                popUpTo(Screen.MemoList.route) { inclusive = true }
-                                launchSingleTop = true
-                            }
+                            viewModel.processBackNavigation()
+                            navController.popBackStack()
                         },
                     ) {
                         Icon(
+                            modifier =
+                                Modifier
+                                    .padding(5.dp)
+                                    .fillMaxSize(),
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "メモリスト画面に戻る",
                             tint = Color.White,
@@ -92,6 +95,7 @@ fun MemoDetailScreen(
                 },
                 actions = {
                     IconButton(
+                        modifier = Modifier,
                         onClick = {
                             viewModel.setDeleteDialogVisible(true)
                         },
@@ -99,10 +103,15 @@ fun MemoDetailScreen(
                         Box(
                             modifier =
                                 Modifier
-                                    .background(color = Color.Gray)
-                                    .padding(4.dp),
+                                    .padding(2.dp)
+                                    .fillMaxSize()
+                                    .background(Color.Gray),
                         ) {
                             Icon(
+                                modifier =
+                                    Modifier
+                                        .padding(5.dp)
+                                        .fillMaxSize(),
                                 imageVector = Icons.Filled.DeleteOutline,
                                 contentDescription = "メモを消すダイアログを出す",
                                 tint = Color.White,

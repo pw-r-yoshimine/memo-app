@@ -26,10 +26,6 @@ class MemoListViewModel
         private val _uiState = MutableStateFlow(MemoListUiState())
         val uiState: StateFlow<MemoListUiState> = _uiState
 
-        init {
-            fetchMemos()
-        }
-
         // メモ一覧を取得する
         fun fetchMemos() {
             viewModelScope.launch {

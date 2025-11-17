@@ -16,7 +16,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * メモ編集のviewmodel
+ * メモ編集用の ViewModel
+ *
+ * @param repository メモデータのリポジトリ
+ * @param savedStateHandle SavedStateHandle（画面状態保持用）
  */
 @HiltViewModel
 class MemoDetailViewModel
@@ -34,65 +37,26 @@ class MemoDetailViewModel
             )
         private val id: Long? = savedStateHandle.get<String>("id")?.toLongOrNull()
 
-        /** ViewModel 初期化時、メモの情報を獲得する */
         init {
-            setMemoType(memoType)
-
-            // 編集モードである　かつ　メモのidが存在する 場合
-            if (memoType == MemoType.Edit && id != null) {
-                getMemo(id)
-            }
+            initializeState()
         }
 
         /**
-         * uiSate.memo.setMemoTypeを更新する
-         *
-         * @param memoType メモのタイプ　新規作成 or 更新
+         * 戻る操作が発生した際に、現在のメモ内容に応じて
+         * 保存または削除の処理を行う。
          */
-        private fun setMemoType(memoType: MemoType) {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    memoType = memoType,
-                )
-            }
-        }
+        fun processBackNavigation() {
+            val state = _uiState.value
 
-        /**
-         *  メモの情報を獲得する
-         *
-         *  @param id メモのid
-         */
-        private fun getMemo(id: Long) {
-            viewModelScope.launch {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        content = repository.getById(id).content,
-                    )
+            when {
+                // 編集モードでかつ、メモの内容が空の場合 -> メモを削除する
+                state.memoType == MemoType.Edit && state.content.isEmpty() -> {
+                    deleteMemo()
                 }
-            }
-        }
-
-        /**
-         * uiSate.memo.contentを更新する
-         *
-         * @param content メモの内容
-         * */
-        fun onContentChange(content: String) {
-            _uiState.update {
-                it.copy(content = content)
-            }
-        }
-
-        /**
-         * uiSate.memo.showDeleteDialogを更新する
-         *
-         * @param isShow true ならダイアログ表示、false なら非表示
-         * */
-        fun setDeleteDialogVisible(isShow: Boolean) {
-            _uiState.update {
-                it.copy(
-                    showDeleteDialog = isShow,
-                )
+                // メモが記入されている場合 -> メモを保存する
+                state.content.isNotBlank() -> {
+                    saveMemo()
+                }
             }
         }
 
@@ -132,6 +96,73 @@ class MemoDetailViewModel
                         content = _uiState.value.content,
                     ),
                 )
+            }
+        }
+
+        /**
+         * uiSate.memo.contentを更新する
+         *
+         * @param content メモの内容
+         * */
+        fun onContentChange(content: String) {
+            _uiState.update {
+                it.copy(content = content)
+            }
+        }
+
+        /**
+         * uiSate.memo.showDeleteDialogを更新する
+         *
+         * @param isShow true ならダイアログ表示、false なら非表示
+         * */
+        fun setDeleteDialogVisible(isShow: Boolean) {
+            _uiState.update {
+                it.copy(
+                    showDeleteDialog = isShow,
+                )
+            }
+        }
+
+        /**
+         * 初期状態の設定を行う。
+         *
+         * メモ作成・編集画面の初期化処理として呼ばれる。
+         * - memoType を UI state に反映
+         * - 編集モードでメモ ID が存在する場合、既存のメモ内容を取得
+         */
+        private fun initializeState() {
+            setMemoType(memoType)
+
+            if (memoType != MemoType.Edit || id == null) return
+
+            getMemo(id)
+        }
+
+        /**
+         * uiSate.memo.setMemoTypeを更新する
+         *
+         * @param memoType メモのタイプ　新規作成 or 更新
+         */
+        private fun setMemoType(memoType: MemoType) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    memoType = memoType,
+                )
+            }
+        }
+
+        /**
+         *  メモの情報を獲得する
+         *
+         *  @param id メモのid
+         */
+        private fun getMemo(id: Long) {
+            viewModelScope.launch {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        content = repository.getById(id).content,
+                    )
+                }
             }
         }
     }

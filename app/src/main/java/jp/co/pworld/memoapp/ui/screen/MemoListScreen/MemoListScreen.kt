@@ -34,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.navigation.NavController
 import jp.co.pworld.memoapp.ui.navigation.Screen
 import jp.co.pworld.memoapp.ui.screen.MemoDetailScreen.MemoType
@@ -51,6 +53,13 @@ fun MemoListScreen(
     viewModel: MemoListViewModel = hiltViewModel(),
 ) {
     val uiState: MemoListUiState by viewModel.uiState.collectAsState()
+
+    /**
+     * ライフサイクルON_STARTを監視
+     */
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        viewModel.fetchMemos()
+    }
 
     Scaffold(
         modifier = Modifier,
