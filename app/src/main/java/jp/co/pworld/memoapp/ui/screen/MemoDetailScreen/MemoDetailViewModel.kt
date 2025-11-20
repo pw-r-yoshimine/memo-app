@@ -60,30 +60,6 @@ class MemoDetailViewModel
             }
         }
 
-        /** メモを保存する */
-        fun saveMemo() {
-            viewModelScope.launch {
-                val content: String = _uiState.value.content
-                when (memoType) {
-                    // メモ作成　
-                    MemoType.Create ->
-                        repository.insert(
-                            Memo(content = content),
-                        )
-                    // メモ更新　
-                    MemoType.Edit ->
-                        id?.let { id ->
-                            repository.update(
-                                Memo(
-                                    id = id,
-                                    content = content,
-                                    updatedAt = System.currentTimeMillis(),
-                                ),
-                            )
-                        }
-                }
-            }
-        }
 
         /** メモを削除する*/
         fun deleteMemo() {
@@ -148,6 +124,31 @@ class MemoDetailViewModel
                 currentState.copy(
                     memoType = memoType,
                 )
+            }
+        }
+
+        /** メモを保存する */
+        private fun saveMemo() {
+            viewModelScope.launch {
+                val content: String = _uiState.value.content
+                when (memoType) {
+                    // メモ作成　
+                    MemoType.Create ->
+                        repository.insert(
+                            Memo(content = content),
+                        )
+                    // メモ更新　
+                    MemoType.Edit ->
+                        id?.let { id ->
+                            repository.update(
+                                Memo(
+                                    id = id,
+                                    content = content,
+                                    updatedAt = System.currentTimeMillis(),
+                                ),
+                            )
+                        }
+                }
             }
         }
 

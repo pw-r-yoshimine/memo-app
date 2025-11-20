@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import jp.co.pworld.memoapp.ui.navigation.Screen
 import jp.co.pworld.memoapp.ui.screen.MemoDetailScreenContent.MemoDetailScreenContent
 import jp.co.pworld.memoapp.ui.screen.dialog.DeleteAlertDialog
 
@@ -53,9 +52,6 @@ fun MemoDetailScreen(
 ) {
     val uiState: MemoDetailUiState by viewModel.uiState.collectAsState()
 
-    /**
-     * 戻るスワイプ感知
-     */
     BackHandler {
         viewModel.processBackNavigation()
         navController.popBackStack()
@@ -95,22 +91,20 @@ fun MemoDetailScreen(
                 },
                 actions = {
                     IconButton(
-                        modifier = Modifier,
+                        modifier = Modifier.padding(2.dp),
                         onClick = {
-                            viewModel.setDeleteDialogVisible(true)
                         },
                     ) {
                         Box(
                             modifier =
                                 Modifier
-                                    .padding(2.dp)
                                     .fillMaxSize()
-                                    .background(Color.Gray),
+                                    .background(Color.Gray)
+                                    .padding(5.dp),
                         ) {
                             Icon(
                                 modifier =
                                     Modifier
-                                        .padding(5.dp)
                                         .fillMaxSize(),
                                 imageVector = Icons.Filled.DeleteOutline,
                                 contentDescription = "メモを消すダイアログを出す",
@@ -125,7 +119,8 @@ fun MemoDetailScreen(
             MemoDetailScreenContent(
                 modifier =
                     Modifier
-                        .padding(innerPadding),
+                        .padding(innerPadding)
+                        .fillMaxSize(),
                 content = uiState.content,
                 onValueChange = {
                     viewModel.onContentChange(it)
@@ -133,18 +128,14 @@ fun MemoDetailScreen(
             )
         },
     )
+
     if (uiState.showDeleteDialog) {
         DeleteAlertDialog(
             onDismissRequest = {
-                viewModel.setDeleteDialogVisible(false)
             },
             onConfirmation = {
                 viewModel.deleteMemo()
-                viewModel.setDeleteDialogVisible(false)
-                navController.navigate(Screen.MemoList.route) {
-                    popUpTo(Screen.MemoList.route) { inclusive = true }
-                    launchSingleTop = true
-                }
+                navController.popBackStack()
             },
         )
     }

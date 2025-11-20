@@ -44,7 +44,7 @@ import jp.co.pworld.memoapp.data.local.entity.Memo
 fun MemoListScreenContent(
     modifier: Modifier = Modifier,
     memoList: List<Memo> = emptyList(),
-    onClick: (id: Long) -> Unit = {},
+    onClick: (id: Long) -> Unit,
 ) {
     if (memoList.isNotEmpty()) {
         // メモが存在する場合

@@ -32,7 +32,6 @@ fun MemoDetailScreenContent(
     OutlinedTextField(
         modifier =
             modifier
-                .fillMaxSize()
                 .heightIn(min = 200.dp),
         value = content,
         onValueChange = {
@@ -63,6 +62,6 @@ fun MemoDetailScreenContent(
 @Composable
 fun MemoDetailScreenContentPreview() {
     MemoDetailScreenContent(
-        modifier = Modifier,
+        modifier = Modifier.fillMaxSize(),
     )
 }
